@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -12,7 +13,8 @@ Route::get('/about', function () {
     return 'about';
 });
 
-Route::resource('products', ProductController::class);
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/create', [ProductController::class, 'create'])->name('products.create')->middleware(['auth', EnsureUserIsAdmin::class]);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
