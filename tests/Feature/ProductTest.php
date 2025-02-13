@@ -66,7 +66,7 @@ class ProductTest extends TestCase
         $response->assertDontSee('Create Product');
     }
 
-    public function test_admin_auth_user_can_see_create_product_button_on_products_index_screen(): void
+    public function test_admin_can_see_create_product_button_on_products_index_screen(): void
     {
         $user = User::factory()->create(['is_admin' => 1]);
 
@@ -91,7 +91,7 @@ class ProductTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_admin_auth_user_can_see_products_create_screen(): void
+    public function test_admin_can_see_products_create_screen(): void
     {
         $user = User::factory()->create(['is_admin' => 1]);
 
@@ -103,6 +103,51 @@ class ProductTest extends TestCase
     public function test_unauth_user_cannot_see_products_create_screen(): void
     {
         $response = $this->get(route('products.create'));
+
+        $response->assertStatus(302)
+            ->assertRedirect('/login');
+    }
+
+    public function test_normal_auth_user_cannot_store_product(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('products.store'), [
+            'name' => 'Product 01',
+            'type' => 'fruit',
+            'price' => 49.99
+        ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_admin_can_store_product(): void
+    {
+        $user = User::factory()->create(['is_admin' => 1]);
+
+        $response = $this->actingAs($user)->post(route('products.store'), [
+            'name' => 'Product 01',
+            'type' => 'fruit',
+            'price' => 49.99
+        ]);
+
+        $response->assertStatus(302)
+            ->assertRedirect(route('products.index'));
+
+        $this->assertDatabaseHas('products', [
+            'name' => 'Product 01',
+            'type' => 'fruit',
+            'price' => 49.99
+        ]);
+    }
+
+    public function test_unauth_user_can_store_product(): void
+    {
+        $response = $this->post(route('products.store'), [
+            'name' => 'Product 01',
+            'type' => 'fruit',
+            'price' => 49.99
+        ]);
 
         $response->assertStatus(302)
             ->assertRedirect('/login');

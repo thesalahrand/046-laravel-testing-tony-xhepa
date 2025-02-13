@@ -15,6 +15,7 @@ Route::get('/about', function () {
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/create', [ProductController::class, 'create'])->name('products.create')->middleware(['auth', EnsureUserIsAdmin::class]);
+Route::post('/products', [ProductController::class, 'store'])->name('products.store')->middleware(['auth', EnsureUserIsAdmin::class]);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
