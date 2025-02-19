@@ -13,6 +13,15 @@
     @auth
       <button>Buy</button>
     @endauth
+    @if (auth()->user()?->is_admin)
+      <a href="{{ route('products.edit', $product->id) }}">Edit Product</a>
+      <form action="{{ route('products.destroy', $product->id) }}" method="post">
+        @csrf
+        @method('DELETE')
+        <a click="event.preventDefault(); this.closest('form').submit();"
+          href="{{ route('products.destroy', $product->id) }}">Delete Product</a>
+      </form>
+    @endif
   @empty
     <p>No products found.</p>
   @endforelse

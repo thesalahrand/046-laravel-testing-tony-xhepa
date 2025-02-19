@@ -27,4 +27,23 @@ class ProductController extends Controller
 
         return to_route('products.index');
     }
+
+    public function edit(Product $product): View
+    {
+        return view('products.edit', compact('product'));
+    }
+
+    public function update(Request $request, Product $product): RedirectResponse
+    {
+        $product->update($request->all());
+
+        return to_route('products.index');
+    }
+
+    public function destroy(Request $request, Product $product): RedirectResponse
+    {
+        $product->delete();
+
+        return to_route('products.index');
+    }
 }
